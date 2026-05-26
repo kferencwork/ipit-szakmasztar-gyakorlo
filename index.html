@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ipari informatikai technikus - Szakmasztár feladatsor</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="page-intro">
+      <p class="subtitle">A 2026-os területi előválogató megoldólapjának kérdéseiből készült interaktív teszt.</p>
+      <div class="year-switcher" aria-label="Év kiválasztása">
+        <button class="year-button active" type="button" data-year="2026">2026</button>
+        <button class="year-button" type="button" data-year="2025">2025</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="tasks" class="tasks" aria-label="Feladatok"></section>
+
+      <div class="toolbar bottom-toolbar" aria-label="Feladatsor eszköztár">
+        <output id="scoreOutput">0 / 100 pont</output>
+        <button id="checkBtn" type="button">Ellenőrzés</button>
+      </div>
+    </main>
+
+    <div class="sniper-overlay" aria-hidden="true">
+      <div class="sniper-scope"></div>
+      <div class="sniper-reload"><span></span></div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
