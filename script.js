@@ -617,7 +617,7 @@ let earnedScores = Array(tasks.length).fill(null);
 let randomMode = true;
 let darkMode = localStorage.getItem("darkMode") === "true";
 const progressStorageKey = "szakmasztarProgress";
-const progressStorageVersion = 2;
+const progressStorageVersion = 3;
 const progressByYear = Object.fromEntries(
   Object.entries(tests).map(([year, test]) => [year, {
     currentTaskIndex: 0,
@@ -704,7 +704,6 @@ function prepareTask(task) {
 
   if (prepared.type === "match") {
     prepared.items = shuffleValues(prepared.items);
-    prepared.choices = shuffleValues(prepared.choices);
   }
 
   return prepared;
