@@ -1113,12 +1113,12 @@ function showQuestionView() {
 
 function showFinishPanel() {
   if (reviewSkippedMode) {
-    submitTest();
+    withLoading(submitTest);
     return;
   }
 
   if (!skippedQuestions.size) {
-    submitTest();
+    withLoading(submitTest);
     return;
   }
 
