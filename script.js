@@ -618,6 +618,10 @@ let randomMode = true;
 let darkMode = localStorage.getItem("darkMode") === "true";
 const progressStorageKey = "szakmasztarProgress";
 const progressStorageVersion = 3;
+const yearRoutes = {
+  "2026": "/2026szakmasztar",
+  "2025": "/2025szakmasztar"
+};
 const progressByYear = Object.fromEntries(
   Object.entries(tests).map(([year, test]) => [year, {
     currentTaskIndex: 0,
@@ -742,6 +746,41 @@ function showAppScreen() {
   appShell.hidden = false;
 }
 
+function returnToStartScreen({ clearProgress = false, routeMode = "replace" } = {}) {
+  if (clearProgress) {
+    clearStoredProgress();
+  }
+  showStartScreen();
+  updateBrowserRoute(null, routeMode);
+}
+
+function yearFromLocation() {
+  const normalizedPath = window.location.pathname
+    .replace(/\/index\.html$/i, "")
+    .replace(/\/+$/, "");
+  return Object.entries(yearRoutes).find(([, route]) => normalizedPath.endsWith(route))?.[0] || null;
+}
+
+function updateBrowserRoute(year, mode = "push") {
+  if (window.location.protocol === "file:") {
+    const target = new URL(
+      year ? `${year}szakmasztar/index.html` : "index.html",
+      document.baseURI
+    ).href;
+
+    if (window.location.href !== target) {
+      window.location[mode === "replace" ? "replace" : "assign"](target);
+    }
+    return;
+  }
+
+  const route = year ? yearRoutes[year] : "/";
+  const state = year ? { view: "test", year } : { view: "home" };
+  const method = mode === "replace" ? "replaceState" : "pushState";
+
+  window.history[method](state, "", route);
+}
+
 function clearStoredProgress() {
   localStorage.removeItem(progressStorageKey);
 }
@@ -785,22 +824,29 @@ function updateProgressWidget() {
   progressScore.hidden = true;
 }
 
+function activateYear(year, { reset = true } = {}) {
+  selectedYear = year;
+  if (reset) {
+    clearStoredProgress();
+    resetProgressForYear(selectedYear);
+  }
+  tasks = orderedTasksForYear(selectedYear);
+  loadYearProgress(selectedYear);
+  skippedQuestions = reset ? new Set() : skippedQuestions;
+  reviewSkippedMode = reset ? false : reviewSkippedMode;
+  reviewSkippedOrder = reset ? [] : reviewSkippedOrder;
+  updateLessonTitle();
+  renderTasks();
+  showQuestionView();
+  updateProgressWidget();
+  showAppScreen();
+  saveYearProgress();
+}
+
 function startYear(year) {
   withLoading(() => {
-    clearStoredProgress();
-    selectedYear = year;
-    resetProgressForYear(selectedYear);
-    tasks = orderedTasksForYear(selectedYear);
-    loadYearProgress(selectedYear);
-    skippedQuestions = new Set();
-    reviewSkippedMode = false;
-    reviewSkippedOrder = [];
-    updateLessonTitle();
-    renderTasks();
-    showQuestionView();
-    updateProgressWidget();
-    showAppScreen();
-    saveYearProgress();
+    activateYear(year);
+    updateBrowserRoute(year);
   });
 }
 
@@ -1030,7 +1076,7 @@ function loadYearProgress(year) {
   finishedMode = progress.finishedMode;
 }
 
-function restoreStoredProgress() {
+function restoreStoredProgress(expectedYear = null) {
   const raw = localStorage.getItem(progressStorageKey);
   if (!raw) {
     return false;
@@ -1038,8 +1084,13 @@ function restoreStoredProgress() {
 
   try {
     const saved = JSON.parse(raw);
-    if (!saved || saved.version !== progressStorageVersion || !tests[saved.selectedYear] || !saved.progressByYear?.[saved.selectedYear]) {
-      clearStoredProgress();
+    if (
+      !saved
+      || saved.version !== progressStorageVersion
+      || !tests[saved.selectedYear]
+      || !saved.progressByYear?.[saved.selectedYear]
+      || (expectedYear && saved.selectedYear !== expectedYear)
+    ) {
       return false;
     }
 
@@ -1259,8 +1310,7 @@ function showSummary() {
   });
   document.querySelector("#summaryHomeBtn").addEventListener("click", () => {
     withLoading(() => {
-      clearStoredProgress();
-      showStartScreen();
+      returnToStartScreen({ clearProgress: true });
     });
   });
   updateProgressWidget();
@@ -1302,8 +1352,7 @@ function closeConfirm() {
 function openExitConfirm() {
   if (!summaryPanel.hidden) {
     withLoading(() => {
-      clearStoredProgress();
-      showStartScreen();
+      returnToStartScreen({ clearProgress: true });
     });
     return;
   }
@@ -1312,8 +1361,7 @@ function openExitConfirm() {
     closeConfirm();
     withLoading(() => {
       resetAnswers();
-      clearStoredProgress();
-      showStartScreen();
+      returnToStartScreen({ clearProgress: true });
     });
   };
   confirmTitle.textContent = "Kilépsz a főmenübe?";
@@ -1365,16 +1413,27 @@ startButtons.forEach(button => {
   button.addEventListener("click", () => startYear(button.dataset.startYear));
 });
 
-updateLessonTitle();
-if (restoreStoredProgress()) {
-  updateLessonTitle();
-  renderTasks();
-  showQuestionView();
-  updateProgressWidget();
-  showAppScreen();
-} else {
-  renderTasks();
-  updateProgressWidget();
-  showStartScreen();
+function renderLocation({ updateState = false } = {}) {
+  const routeYear = yearFromLocation();
+
+  if (!routeYear) {
+    showStartScreen();
+    if (updateState) {
+      updateBrowserRoute(null, "replace");
+    }
+    return;
+  }
+
+  const restored = restoreStoredProgress(routeYear);
+  activateYear(routeYear, { reset: !restored });
+  if (updateState) {
+    updateBrowserRoute(routeYear, "replace");
+  }
 }
+
+window.addEventListener("popstate", () => {
+  withLoading(() => renderLocation());
+});
+
+renderLocation({ updateState: true });
 withLoading(() => {});

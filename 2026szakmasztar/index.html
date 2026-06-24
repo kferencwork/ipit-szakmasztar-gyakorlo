@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="hu">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <base href="../">
+    <title>Ipari informatikai technikus - Szakmasztár feladatsor</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <section id="startScreen" class="start-screen" aria-label="Feladatsor kiválasztása">
+      <div class="tech-banner">
+        <div class="banner-pattern" aria-hidden="true"></div>
+      </div>
+      <div class="start-content">
+        <p class="start-kicker">Ipari informatikai technikus</p>
+        <h1>Szakmasztár gyakorló</h1>
+        <div class="start-cards">
+          <button class="start-card" type="button" data-start-year="2026">
+            <span class="start-year">2026</span>
+            <span class="start-title">Szakmasztár feladatsor</span>
+            <span class="start-meta">40 kérdés / 100 pont</span>
+          </button>
+          <button class="start-card" type="button" data-start-year="2025">
+            <span class="start-year">2025</span>
+            <span class="start-title">Szakmasztár feladatsor</span>
+            <span class="start-meta">39 kérdés / 100 pont</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div id="appShell" class="app-shell" hidden>
+      <main class="lesson">
+        <section id="tasks" class="tasks" aria-label="Feladatok"></section>
+        <section id="finishPanel" class="finish-panel" hidden>
+          <h1>Végigértél a feladatsoron</h1>
+          <p id="finishText"></p>
+          <div class="finish-actions">
+            <button id="answerSkippedBtn" class="secondary-button" type="button">Átugrott kérdések megválaszolása</button>
+            <button id="submitBtn" type="button">Beadás</button>
+          </div>
+        </section>
+        <section id="summaryPanel" class="summary-panel" hidden></section>
+        <div class="toolbar bottom-toolbar" aria-label="Feladatsor eszköztár">
+          <button id="skipBtn" class="secondary-button" type="button">Átugrás</button>
+          <button id="nextBtn" type="button">Tovább</button>
+        </div>
+      </main>
+
+      <aside class="side-rail" aria-label="Előrehaladás">
+        <div id="progressWidget" class="progress-widget" tabindex="0" aria-label="Előrehaladás és eredmény">
+          <div class="progress-ring"><span id="progressPercent">0%</span></div>
+          <div class="progress-popover">
+            <strong id="progressQuestions">1/40 kérdés</strong>
+            <span id="progressScore">0/100 pont</span>
+          </div>
+        </div>
+        <button id="exitBtn" class="exit-button" type="button" aria-label="Kilépés a főmenübe">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 10.8 12 4l8 6.8" />
+            <path d="M6.5 10.5V20h11v-9.5" />
+            <path d="M10 20v-5h4v5" />
+          </svg>
+        </button>
+      </aside>
+    </div>
+
+    <div id="confirmOverlay" class="confirm-overlay" hidden>
+      <div class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+        <h2 id="confirmTitle">Újrakezdődik a teszt</h2>
+        <p id="confirmMessage">Biztosan folytatod?</p>
+        <div class="confirm-actions">
+          <button id="confirmCancelBtn" class="secondary-button" type="button">Mégse</button>
+          <button id="confirmAcceptBtn" class="danger-button" type="button">Igen</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay active">
+      <div class="loading-spinner" aria-label="Betöltés"></div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
